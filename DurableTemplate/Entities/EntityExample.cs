@@ -3,10 +3,10 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 
-namespace DurableTemplate
+namespace DurableTemplate.Entities
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class EntityExample
+    public class EntityExample : IEntityExample
     {
         [JsonProperty("value")]
         public int CurrentValue { get; set; }

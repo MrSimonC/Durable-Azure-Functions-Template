@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace DurableTemplate
+namespace DurableTemplate.Functions
 {
     public static class OrchestrationExample
     {

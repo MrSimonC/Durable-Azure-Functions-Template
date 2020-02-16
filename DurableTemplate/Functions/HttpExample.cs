@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http;
 
-namespace DurableTemplate
+namespace DurableTemplate.Functions
 {
     public class HttpExample
     {
