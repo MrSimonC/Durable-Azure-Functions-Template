@@ -13,11 +13,11 @@ namespace DurableTemplate.Functions
 {
     public class HttpExample
     {
-        private readonly HttpClient _client;
+        private readonly HttpClient client;
 
         public HttpExample(IHttpClientFactory httpClientFactory)
         {
-            _client = httpClientFactory.CreateClient();
+            client = httpClientFactory.CreateClient();
         }
 
         [FunctionName("HttpExample")]
@@ -33,7 +33,7 @@ namespace DurableTemplate.Functions
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name ??= data?.name;
 
-            HttpResponseMessage response = await _client.GetAsync("https://github.com");
+            HttpResponseMessage response = await client.GetAsync("https://github.com");
             if (response.IsSuccessStatusCode)
             {
                 return new OkObjectResult($"Success");

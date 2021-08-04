@@ -2,10 +2,10 @@
 {
     public interface IEntityExample
     {
-        int CurrentValue { get; set; }
-
-        void Add(int amount);
-        int Get();
-        void Reset();
+        void SetAvailable(bool available);
+        void SetName(string name);
+        void SetNotificationSent(bool available);
+        void SetOnPromotion(bool available);
+        void SetPrice(string amount);
     }
 }

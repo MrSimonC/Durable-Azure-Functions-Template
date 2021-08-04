@@ -8,14 +8,27 @@ namespace DurableTemplate.Entities
     [JsonObject(MemberSerialization.OptIn)]
     public class EntityExample : IEntityExample
     {
+        [JsonProperty("name")]
+        public string Name { get; set; } = "";
+        public void SetName(string name) => Name = name;
+
         [JsonProperty("value")]
-        public int CurrentValue { get; set; }
+        public string Price { get; set; } = string.Empty;
+        public void SetPrice(string amount) => Price = amount;
 
-        public void Add(int amount) => CurrentValue += amount;
+        [JsonProperty("available")]
+        public bool Available { get; set; } = true;
+        public void SetAvailable(bool available) => Available = available;
 
-        public void Reset() => CurrentValue = 0;
+        [JsonProperty("onpromotion")]
+        public bool OnPromotion { get; set; } = false;
+        public void SetOnPromotion(bool available) => OnPromotion = available;
 
-        public int Get() => CurrentValue;
+        [JsonProperty("notificationsent")]
+        public bool NotificationSent { get; set; } = false;
+        public void SetNotificationSent(bool available) => NotificationSent = available;
+
+        public string UniqueId { get; set; } = string.Empty;
 
         [FunctionName(nameof(EntityExample))]
         public static Task Run([EntityTrigger] IDurableEntityContext ctx)
