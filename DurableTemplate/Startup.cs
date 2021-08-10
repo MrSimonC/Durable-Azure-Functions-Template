@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 using DurableTemplate;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -12,7 +11,7 @@ namespace DurableTemplate
 {
     public class Startup : FunctionsStartup
     {
-        public override void Configure(IFunctionsHostBuilder builder)
+        public override async void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddHttpClient();
 
@@ -30,10 +29,10 @@ namespace DurableTemplate
                 bfOptions.Path = Path.GetTempPath();
             }
             var bf = new BrowserFetcher(bfOptions);
-            bf.DownloadAsync(BrowserFetcher.DefaultChromiumRevision).Wait();
+            await bf.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
             var info = new AppInfo
             {
-                BrowserExecutablePath = bf.GetExecutablePath(BrowserFetcher.DefaultRevision)
+                BrowserExecutablePath = bf.GetExecutablePath(BrowserFetcher.DefaultChromiumRevision)
             };
             builder.Services.AddSingleton(info);
         }
