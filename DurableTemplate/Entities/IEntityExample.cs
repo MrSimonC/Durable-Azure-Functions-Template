@@ -2,10 +2,11 @@
 {
     public interface IEntityExample
     {
-        void SetAvailable(bool available);
         void SetName(string name);
-        void SetNotificationSent(bool available);
-        void SetOnPromotion(bool available);
-        void SetPrice(string amount);
+
+        Task<List<string>> GetEvents();
+        void SetEvents(List<string> events);
+        void AddEvent(string evnt);
+        void RemoveEvent(string evnt);
     }
 }

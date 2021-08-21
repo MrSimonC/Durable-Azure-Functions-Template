@@ -1,10 +1,8 @@
+using DurableTemplate.Entities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace DurableTemplate.Functions
 {
@@ -14,30 +12,30 @@ namespace DurableTemplate.Functions
         public static async Task<List<string>> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
-            var outputs = new List<string>
-            {
-
-                // Replace "hello" with the name of your Durable Activity Function.
-                await context.CallActivityAsync<string>("OrchestrationExample_Hello", "Tokyo"),
-                await context.CallActivityAsync<string>("OrchestrationExample_Hello", "Seattle"),
-                await context.CallActivityAsync<string>("OrchestrationExample_Hello", "London")
-            };
-
-            // returns ["Hello Tokyo!", "Hello Seattle!", "Hello London!"]
-            return outputs;
+            return await context.CallActivityAsync<List<string>>("Get_Entities", null);
         }
 
-        [FunctionName("OrchestrationExample_Hello")]
-        public static string SayHello([ActivityTrigger] string name, ILogger log)
+        [FunctionName("Get_Entities")]
+        public static async Task<List<string>> GetEntitiesAsync(
+            [ActivityTrigger] string name,
+            ILogger log,
+            [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
-            log.LogInformation($"Saying hello to {name}.");
-            return $"Hello {name}!";
+            var egEntity = new EntityId(nameof(EntityExample), "myEntityKey");
+
+            // signal entity
+            context.SignalEntity(egEntity, "AddEvent", "my new event");
+            // or, with proxy
+            EntityExample? entityProxy = context.CreateEntityProxy<EntityExample>(egEntity);
+            entityProxy.AddEvent("my new event"); // return is void, so operation is "signaled"
+            // get
+            return await entityProxy.GetEvents(); // return is a task, so operation is "called"
         }
 
         [FunctionName("OrchestrationExample_HttpStart")]
         public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]HttpRequestMessage req,
-            [DurableClient]IDurableOrchestrationClient starter,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
+            [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
             // Function input comes from the request content.

@@ -15,10 +15,7 @@ namespace DurableTemplate.Functions
     {
         private readonly AppInfo AppInfo;
 
-        public PuppeteerSharpExample(AppInfo appInfo)
-        {
-            AppInfo = appInfo;
-        }
+        public PuppeteerSharpExample(AppInfo appInfo) => AppInfo = appInfo;
 
         [FunctionName("PuppeteerSharpExample")]
         public async Task<IActionResult> Run(
