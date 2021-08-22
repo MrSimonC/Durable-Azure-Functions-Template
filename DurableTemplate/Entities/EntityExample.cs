@@ -13,7 +13,7 @@ namespace DurableTemplate.Entities
 
         [JsonProperty("events")]
         public List<string> Events { get; set; } = new List<string>();
-        public Task<List<string>> GetEvents() => Task.FromResult(Events); // Task return type means "call"
+        public Task<List<string>> GetEventsAsync() => Task.FromResult(Events); // Task return type means "call"
         public void SetEvents(List<string> events) => Events = events; // Void return type means "signal"
         public void AddEvent(string evnt) => Events.Add(evnt);
         public void RemoveEvent(string evnt) => Events.Remove(evnt);

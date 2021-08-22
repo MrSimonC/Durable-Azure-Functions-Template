@@ -34,7 +34,7 @@ namespace DurableTemplate.Functions
             IEntityExample? entityProxy = context.CreateEntityProxy<IEntityExample>(myEntity);
 
             entityProxy.AddEvent("my new event"); // signal (don't wait) as return is void.
-            List<string> result = await entityProxy.GetEvents(); // signal (wait & return) as return is a task.
+            List<string> result = await entityProxy.GetEventsAsync(); // signal (wait & return) as return is a task.
             return result;
         }
 
