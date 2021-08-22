@@ -12,16 +12,22 @@ namespace DurableTemplate.Functions
         public static async Task<List<string>> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
+            // param into orchestrator
+            OrchestratorInput oi = context.GetInput<OrchestratorInput>();
             // call activity function
-            await context.CallActivityAsync<List<string>>(nameof(MyActivityFunction), null);
+            await context.CallActivityAsync<List<string>>(nameof(MyActivityFunction), oi.Url);
             // call durable entity
             List<string> result = await ContactDurableEntity(context);
+            // call http
+            var request = new DurableHttpRequest(HttpMethod.Post, new Uri(oi.Url), content: "myContent");
+            DurableHttpResponse response = await context.CallHttpAsync(request);
+
             return result;
         }
 
         [FunctionName(nameof(MyActivityFunction))]
         public static async Task MyActivityFunction(
-            [ActivityTrigger] string name,
+            [ActivityTrigger] string url,
             ILogger log)
         {
             return;
@@ -30,8 +36,8 @@ namespace DurableTemplate.Functions
         private static async Task<List<string>> ContactDurableEntity(
             IDurableOrchestrationContext context)
         {
-            var myEntity = new EntityId(nameof(EntityExample), "myEntityKey");
-            IEntityExample? entityProxy = context.CreateEntityProxy<IEntityExample>(myEntity);
+            var entity = new EntityId(nameof(EntityExample), "myEntityKey");
+            IEntityExample entityProxy = context.CreateEntityProxy<IEntityExample>(entity);
 
             entityProxy.AddEvent("my new event"); // signal (don't wait) as return is void.
             List<string> result = await entityProxy.GetEventsAsync(); // signal (wait & return) as return is a task.
@@ -44,12 +50,20 @@ namespace DurableTemplate.Functions
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-            // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync(nameof(OrchestrationExample), null);
+            string envVar = "MY_ENV_VAR";
+            string url = Environment.GetEnvironmentVariable(envVar) ?? throw new ArgumentNullException(envVar);
+            OrchestratorInput oi = new() { Url = url };
+
+            string instanceId = await starter.StartNewAsync(nameof(OrchestrationExample), "myInstance", oi.Url);
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
             return starter.CreateCheckStatusResponse(req, instanceId);
+        }
+
+        private class OrchestratorInput
+        {
+            public string Url { get; set; } = string.Empty;
         }
     }
 }
