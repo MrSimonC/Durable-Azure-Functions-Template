@@ -15,11 +15,6 @@ namespace DurableTemplate
         {
             builder.Services.AddHttpClient();
 
-            //builder.Services.AddSingleton((s) =>
-            //{
-            //    return new MyService();
-            //});
-
             //builder.Services.AddSingleton<ILoggerProvider, MyLoggerProvider>();
 
             // for PupeteerSharp browser automation

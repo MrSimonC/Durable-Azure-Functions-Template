@@ -5,7 +5,9 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace DurableTemplate.Functions
 {
@@ -18,36 +20,31 @@ namespace DurableTemplate.Functions
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log,
-            [DurableClient] IDurableEntityClient durableEntityClient,
-            IDurableEntityContext context)
+            [DurableClient] IDurableEntityClient durableEntityClient)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            MyClass? response = await httpClient.GetFromJsonAsync<MyClass>("https://github.com");
-            if (string.IsNullOrEmpty(response?.Name))
-            {
-                return new BadRequestObjectResult($"Name was empty");
-            }
+            // http client json
+            string url = "https://mocki.io/v1/d569cadb-8f0b-4271-af06-84368787252d";
+            MyClass? response = await httpClient.GetFromJsonAsync<MyClass>(url);
 
+            // durable entity
             var entityId = new EntityId(nameof(EntityExample), "myEntity1");
             EntityStateResponse<EntityExample> stateResponse = await durableEntityClient.ReadEntityStateAsync<EntityExample>(entityId);
+            await durableEntityClient.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName(response.Name));
 
             if (!stateResponse.EntityExists)
             {
-                await durableEntityClient.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName(response.Name));
-                // or
-                context.SignalEntity<IEntityExample>(entityId, e => e.SetName(response.Name));
-
-                context.StartNewOrchestration(nameof(OrchestrationExample), null);
+                string entityNameProperty = stateResponse.EntityState.Name;
+                // ...
             }
-            return response.Name != null
-                ? new OkObjectResult($"Hello, {response.Name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+
+            return new OkObjectResult($"Hello"); // or BadRequestObjectResult()
         }
     }
 
     public class MyClass
     {
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

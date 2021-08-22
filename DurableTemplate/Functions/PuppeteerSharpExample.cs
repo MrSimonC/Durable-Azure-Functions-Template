@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using DurableTemplate.Entities;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +6,7 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
+using System.Threading.Tasks;
 
 namespace DurableTemplate.Functions
 {
@@ -38,13 +37,6 @@ namespace DurableTemplate.Functions
             string? html = await page.GetContentAsync();
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
-
-            // read
-            var entityId = new EntityId(nameof(EntityExample), $"UniqueStringIdForMyEntity");
-            EntityStateResponse<EntityExample> stateResponse = await client.ReadEntityStateAsync<EntityExample>(entityId);
-
-            // write
-            await client.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName("newName"));
 
             string responseMessage = "response message";
 

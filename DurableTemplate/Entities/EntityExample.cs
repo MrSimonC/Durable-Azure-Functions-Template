@@ -1,6 +1,8 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DurableTemplate.Entities
 {
@@ -13,8 +15,8 @@ namespace DurableTemplate.Entities
 
         [JsonProperty("events")]
         public List<string> Events { get; set; } = new List<string>();
-        public Task<List<string>> GetEvents() => Task.FromResult(Events); // Returning a task means orchestrator will "call" not "signal" this method
-        public void SetEvents(List<string> events) => Events = events;
+        public Task<List<string>> GetEvents() => Task.FromResult(Events); // Task return type means "call"
+        public void SetEvents(List<string> events) => Events = events; // Void return type means "signal"
         public void AddEvent(string evnt) => Events.Add(evnt);
         public void RemoveEvent(string evnt) => Events.Remove(evnt);
 

@@ -1,4 +1,7 @@
-﻿namespace DurableTemplate.Entities
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace DurableTemplate.Entities
 {
     public interface IEntityExample
     {

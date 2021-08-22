@@ -3,43 +3,52 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace DurableTemplate.Functions
 {
     public static class OrchestrationExample
     {
-        [FunctionName("OrchestrationExample")]
+        [FunctionName(nameof(OrchestrationExample))]
         public static async Task<List<string>> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
-            return await context.CallActivityAsync<List<string>>("Get_Entities", null);
+            // call activity function
+            await context.CallActivityAsync<List<string>>(nameof(MyActivityFunction), null);
+            // call durable entity
+            List<string> result = await ContactDurableEntity(context);
+            return result;
         }
 
-        [FunctionName("Get_Entities")]
-        public static async Task<List<string>> GetEntitiesAsync(
+        [FunctionName(nameof(MyActivityFunction))]
+        public static async Task MyActivityFunction(
             [ActivityTrigger] string name,
-            ILogger log,
-            [OrchestrationTrigger] IDurableOrchestrationContext context)
+            ILogger log)
         {
-            var egEntity = new EntityId(nameof(EntityExample), "myEntityKey");
-
-            // signal entity
-            context.SignalEntity(egEntity, "AddEvent", "my new event");
-            // or, with proxy
-            EntityExample? entityProxy = context.CreateEntityProxy<EntityExample>(egEntity);
-            entityProxy.AddEvent("my new event"); // return is void, so operation is "signaled"
-            // get
-            return await entityProxy.GetEvents(); // return is a task, so operation is "called"
+            return;
         }
 
-        [FunctionName("OrchestrationExample_HttpStart")]
+        private static async Task<List<string>> ContactDurableEntity(
+            IDurableOrchestrationContext context)
+        {
+            var myEntity = new EntityId(nameof(EntityExample), "myEntityKey");
+            var entityProxy = context.CreateEntityProxy<IEntityExample>(myEntity);
+            
+            entityProxy.AddEvent("my new event"); // signal (don't wait) as return is void.
+            List<string> result = await entityProxy.GetEvents(); // signal (wait & return) as return is a task.
+            return result;
+        }
+
+        [FunctionName(nameof(HttpStart))]
         public static async Task<HttpResponseMessage> HttpStart(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
             // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("OrchestrationExample", null);
+            string instanceId = await starter.StartNewAsync(nameof(OrchestrationExample), null);
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
