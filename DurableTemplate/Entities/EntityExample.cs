@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DurableTemplate.Entities
 {
@@ -20,8 +18,8 @@ namespace DurableTemplate.Entities
         public void AddEvent(string evnt) => Events.Add(evnt);
         public void RemoveEvent(string evnt) => Events.Remove(evnt);
 
-         [FunctionName(nameof(EntityExample))]
+        [FunctionName(nameof(EntityExample))]
         public static Task Run([EntityTrigger] IDurableEntityContext ctx)
-            => ctx.DispatchAsync<EntityExample>();
+           => ctx.DispatchAsync<EntityExample>();
     }
 }

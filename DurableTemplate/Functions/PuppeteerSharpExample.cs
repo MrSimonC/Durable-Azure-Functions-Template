@@ -6,7 +6,6 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
-using System.Threading.Tasks;
 
 namespace DurableTemplate.Functions
 {

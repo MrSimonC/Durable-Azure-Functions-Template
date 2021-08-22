@@ -3,9 +3,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace DurableTemplate.Functions
 {
@@ -34,8 +31,8 @@ namespace DurableTemplate.Functions
             IDurableOrchestrationContext context)
         {
             var myEntity = new EntityId(nameof(EntityExample), "myEntityKey");
-            var entityProxy = context.CreateEntityProxy<IEntityExample>(myEntity);
-            
+            IEntityExample? entityProxy = context.CreateEntityProxy<IEntityExample>(myEntity);
+
             entityProxy.AddEvent("my new event"); // signal (don't wait) as return is void.
             List<string> result = await entityProxy.GetEvents(); // signal (wait & return) as return is a task.
             return result;

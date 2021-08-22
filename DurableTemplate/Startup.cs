@@ -1,9 +1,8 @@
-﻿using System.IO;
-using System.Runtime.InteropServices;
-using DurableTemplate;
+﻿using DurableTemplate;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using PuppeteerSharp;
+using System.Runtime.InteropServices;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
