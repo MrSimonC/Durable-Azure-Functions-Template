@@ -19,6 +19,5 @@ public class EntityExample : IEntityExample
     public void RemoveEvent(string evnt) => Events.Remove(evnt);
 
     [FunctionName(nameof(EntityExample))]
-    public static Task Run([EntityTrigger] IDurableEntityContext ctx)
-       => ctx.DispatchAsync<EntityExample>();
+    public static Task Run([EntityTrigger] IDurableEntityContext ctx) => ctx.DispatchAsync<EntityExample>();
 }
