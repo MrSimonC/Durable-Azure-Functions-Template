@@ -7,47 +7,46 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
-namespace DurableTemplate.Functions
+namespace DurableTemplate.Functions;
+
+public class HttpExample
 {
-    public class HttpExample
-    {
-        private readonly HttpClient httpClient;
-        public HttpExample(IHttpClientFactory httpClientFactory) => httpClient = httpClientFactory.CreateClient();
+    private readonly HttpClient httpClient;
+    public HttpExample(IHttpClientFactory httpClientFactory) => httpClient = httpClientFactory.CreateClient();
 
-        [FunctionName("HttpExample")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log,
-            [DurableClient] IDurableEntityClient durableEntityClient)
+    [FunctionName("HttpExample")]
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+        ILogger log,
+        [DurableClient] IDurableEntityClient durableEntityClient)
+    {
+        log.LogInformation("C# HTTP trigger function processed a request.");
+
+        // http client json
+        string url = "https://mocki.io/v1/d569cadb-8f0b-4271-af06-84368787252d";
+        MyClass? response = await httpClient.GetFromJsonAsync<MyClass>(url);
+
+        // durable entity
+        var entityId = new EntityId(nameof(EntityExample), "myEntity1");
+        EntityStateResponse<EntityExample> stateResponse = await durableEntityClient.ReadEntityStateAsync<EntityExample>(entityId);
+
+        if (!stateResponse.EntityExists)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
-            // http client json
-            string url = "https://mocki.io/v1/d569cadb-8f0b-4271-af06-84368787252d";
-            MyClass? response = await httpClient.GetFromJsonAsync<MyClass>(url);
-
-            // durable entity
-            var entityId = new EntityId(nameof(EntityExample), "myEntity1");
-            EntityStateResponse<EntityExample> stateResponse = await durableEntityClient.ReadEntityStateAsync<EntityExample>(entityId);
-
-            if (!stateResponse.EntityExists)
-            {
-                await durableEntityClient.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName(response.Name));
-                // ...
-            }
-            else
-            {
-                var myEntity = stateResponse.EntityState;
-                string entityNameProperty = myEntity.Name;
-
-            }
-
-            return new OkObjectResult($"Hello"); // or BadRequestObjectResult()
+            await durableEntityClient.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName(response.Name));
+            // ...
         }
-    }
+        else
+        {
+            EntityExample? myEntity = stateResponse.EntityState;
+            string entityNameProperty = myEntity.Name;
 
-    public class MyClass
-    {
-        public string Name { get; set; } = string.Empty;
+        }
+
+        return new OkObjectResult($"Hello"); // or BadRequestObjectResult()
     }
+}
+
+public class MyClass
+{
+    public string Name { get; set; } = string.Empty;
 }

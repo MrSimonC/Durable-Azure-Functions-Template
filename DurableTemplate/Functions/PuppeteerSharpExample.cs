@@ -7,39 +7,38 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using PuppeteerSharp;
 
-namespace DurableTemplate.Functions
+namespace DurableTemplate.Functions;
+
+public class PuppeteerSharpExample
 {
-    public class PuppeteerSharpExample
+    private readonly AppInfo AppInfo;
+
+    public PuppeteerSharpExample(AppInfo appInfo) => AppInfo = appInfo;
+
+    [FunctionName("PuppeteerSharpExample")]
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+        ILogger log,
+        [DurableClient] IDurableEntityClient client)
     {
-        private readonly AppInfo AppInfo;
-
-        public PuppeteerSharpExample(AppInfo appInfo) => AppInfo = appInfo;
-
-        [FunctionName("PuppeteerSharpExample")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log,
-            [DurableClient] IDurableEntityClient client)
+        Browser browser = await Puppeteer.LaunchAsync(new LaunchOptions
         {
-            Browser browser = await Puppeteer.LaunchAsync(new LaunchOptions
-            {
-                Headless = true,
-                ExecutablePath = AppInfo.BrowserExecutablePath
-            });
+            Headless = true,
+            ExecutablePath = AppInfo.BrowserExecutablePath
+        });
 
-            Page page = await browser.NewPageAsync();
-            await page.SetUserAgentAsync("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36");
+        Page page = await browser.NewPageAsync();
+        await page.SetUserAgentAsync("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36");
 
-            string url = "https://www.bing.com";
-            log.LogInformation($"going to url {url}");
-            await page.GoToAsync(url);
-            string? html = await page.GetContentAsync();
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
+        string url = "https://www.bing.com";
+        log.LogInformation($"going to url {url}");
+        await page.GoToAsync(url);
+        string? html = await page.GetContentAsync();
+        var doc = new HtmlDocument();
+        doc.LoadHtml(html);
 
-            string responseMessage = "response message";
+        string responseMessage = "response message";
 
-            return new OkObjectResult(responseMessage);
-        }
+        return new OkObjectResult(responseMessage);
     }
 }

@@ -3,10 +3,9 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
-namespace DurableTemplate
+namespace DurableTemplate;
+
+public class AppInfo
 {
-    public class AppInfo
-    {
-        public string BrowserExecutablePath { get; set; } = string.Empty;
-    }
+    public string BrowserExecutablePath { get; set; } = string.Empty;
 }
