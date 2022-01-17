@@ -23,4 +23,8 @@
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 		</None>
 	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\DurableShared\*.cs" />
+		<Compile Include="..\DurableShared\Entities\*.cs" />
+	</ItemGroup>
 </Project>

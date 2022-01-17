@@ -2,7 +2,7 @@
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
 
-namespace DurableTemplate.Entities;
+namespace DurableShared.Entities;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class EntityExample : IEntityExample
@@ -19,6 +19,5 @@ public class EntityExample : IEntityExample
     public void RemoveEvent(string evnt) => Events.Remove(evnt);
 
     [FunctionName(nameof(EntityExample))]
-    public static Task Run([EntityTrigger] IDurableEntityContext ctx)
-       => ctx.DispatchAsync<EntityExample>();
+    public static Task Run([EntityTrigger] IDurableEntityContext ctx) => ctx.DispatchAsync<EntityExample>();
 }

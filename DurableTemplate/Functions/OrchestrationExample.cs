@@ -1,4 +1,4 @@
-using DurableTemplate.Entities;
+using DurableShared.Entities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
