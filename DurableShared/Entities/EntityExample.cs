@@ -2,7 +2,7 @@
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Newtonsoft.Json;
 
-namespace DurableTemplate.Entities;
+namespace DurableShared.Entities;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class EntityExample : IEntityExample

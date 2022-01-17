@@ -1,4 +1,4 @@
-﻿namespace DurableTemplate.Entities;
+﻿namespace DurableShared.Entities;
 
 public interface IEntityExample
 {
