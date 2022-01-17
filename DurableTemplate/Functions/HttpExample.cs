@@ -29,12 +29,17 @@ namespace DurableTemplate.Functions
             // durable entity
             var entityId = new EntityId(nameof(EntityExample), "myEntity1");
             EntityStateResponse<EntityExample> stateResponse = await durableEntityClient.ReadEntityStateAsync<EntityExample>(entityId);
-            await durableEntityClient.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName(response.Name));
 
             if (!stateResponse.EntityExists)
             {
-                string entityNameProperty = stateResponse.EntityState.Name;
+                await durableEntityClient.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName(response.Name));
                 // ...
+            }
+            else
+            {
+                var myEntity = stateResponse.EntityState;
+                string entityNameProperty = myEntity.Name;
+
             }
 
             return new OkObjectResult($"Hello"); // or BadRequestObjectResult()
