@@ -12,6 +12,6 @@ public class EntityOperations
 
     public static EntityId GetEntityId<T>(string uniqueKey) where T : class
     {
-        return new EntityId(nameof(T), uniqueKey);
+        return new EntityId(typeof(T).Name, uniqueKey);
     }
 }
