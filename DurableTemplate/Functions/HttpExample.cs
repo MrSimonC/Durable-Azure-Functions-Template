@@ -6,13 +6,22 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 
 namespace DurableTemplate.Functions;
 
-public class HttpExample
+public partial class HttpExample
 {
+    ILogger? logger;
+
+    [LoggerMessage(0, LogLevel.Information, "{memberName}() {uniqueKey}: {message}")]
+    partial void LogInfo(string message, string uniqueKey, [CallerMemberName] string memberName = "");
+
     private readonly HttpClient httpClient;
-    public HttpExample(IHttpClientFactory httpClientFactory) => httpClient = httpClientFactory.CreateClient();
+    public HttpExample(IHttpClientFactory httpClientFactory)
+    {
+        httpClient = httpClientFactory.CreateClient();
+    }
 
     [FunctionName("HttpExample")]
     public async Task<IActionResult> Run(
@@ -20,7 +29,8 @@ public class HttpExample
         ILogger log,
         [DurableClient] IDurableEntityClient durableEntityClient)
     {
-        log.LogInformation("C# HTTP trigger function processed a request.");
+        logger = log;
+        LogInfo("Function Started.", string.Empty);
 
         // http client json
         string url = "https://mocki.io/v1/d569cadb-8f0b-4271-af06-84368787252d";
@@ -32,11 +42,13 @@ public class HttpExample
 
         if (!stateResponse.EntityExists)
         {
+            LogInfo("Doesn't exist.", entityId.EntityKey);
             await durableEntityClient.SignalEntityAsync<IEntityExample>(entityId, e => e.SetName(response.Name));
             // ...
         }
         else
         {
+            LogInfo("Existing entry found.", entityId.EntityKey);
             EntityExample? myEntity = stateResponse.EntityState;
             string entityNameProperty = myEntity.Name;
 
